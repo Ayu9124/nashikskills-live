@@ -1,0 +1,109 @@
+{
+  "entities": {
+    "IndustryResponse": {
+      "title": "Industry Response",
+      "description": "Skill gap data provided by local industries.",
+      "type": "object",
+      "properties": {
+        "companyName": { "type": "string", "description": "Name of the company." },
+        "sector": { "type": "string", "description": "Industry sector (auto, agri, sme, logi)." },
+        "missingSkills": { "type": "array", "items": { "type": "string" }, "description": "List of missing skills." },
+        "hiringTarget": { "type": "string", "description": "Estimated hiring target for the year." },
+        "message": { "type": "string", "description": "Optional message for students." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of submission." }
+      },
+      "required": ["companyName", "sector", "missingSkills", "createdAt"]
+    },
+    "StudentProfile": {
+      "title": "Student Profile",
+      "description": "User profile for students tracking their skills.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID." },
+        "displayName": { "type": "string", "description": "User's display name." },
+        "email": { "type": "string", "description": "User's email address." },
+        "college": { "type": "string", "description": "Student's college name." },
+        "targetSector": { "type": "string", "description": "Target industry sector." },
+        "mySkills": { "type": "array", "items": { "type": "string" }, "description": "List of skills the student currently has." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp." }
+      },
+      "required": ["uid", "email", "updatedAt"]
+    },
+    "StudentPublicProfile": {
+      "title": "Student Public Profile",
+      "description": "Publicly searchable student profile for talent matching.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID." },
+        "displayName": { "type": "string", "description": "User's display name." },
+        "college": { "type": "string", "description": "Student's college name." },
+        "targetSector": { "type": "string", "description": "Target industry sector." },
+        "mySkills": { "type": "array", "items": { "type": "string" }, "description": "List of skills the student currently has." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp." }
+      },
+      "required": ["uid", "displayName", "updatedAt"]
+    },
+    "AnonymousStudentResponse": {
+      "title": "Anonymous Student Response",
+      "description": "Skill data provided by unauthenticated students.",
+      "type": "object",
+      "properties": {
+        "college": { "type": "string", "description": "Student's college name." },
+        "targetSector": { "type": "string", "description": "Target industry sector." },
+        "mySkills": { "type": "array", "items": { "type": "string" }, "description": "List of skills the student currently has." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp of submission." }
+      },
+      "required": ["targetSector", "mySkills", "createdAt"]
+    },
+    "SkillLog": {
+      "title": "Skill Log",
+      "description": "Historical snapshot of a student's skill match percentage.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Student's UID." },
+        "matchPercentage": { "type": "number", "description": "Match percentage at that time." },
+        "sector": { "type": "string", "description": "Sector for which it was calculated." },
+        "skillsCount": { "type": "number", "description": "Number of skills the student had." },
+        "timestamp": { "type": "string", "format": "date-time", "description": "Time of logging." }
+      },
+      "required": ["uid", "matchPercentage", "timestamp"]
+    },
+    "SkillGapAggregates": {
+      "title": "Skill Gap Aggregates",
+      "description": "Aggregated skill gap percentages per sector.",
+      "type": "object",
+      "properties": {
+        "sector": { "type": "string", "description": "Industry sector." },
+        "skillName": { "type": "string", "description": "Name of the skill." },
+        "gapPercentage": { "type": "number", "description": "Calculated gap percentage." },
+        "responseCount": { "type": "number", "description": "Number of industry responses for this skill." }
+      }
+    }
+  },
+  "firestore": {
+    "/industry_responses/{responseId}": {
+      "schema": "IndustryResponse",
+      "description": "Collection of all industry skill gap reports."
+    },
+    "/student_profiles/{uid}": {
+      "schema": "StudentProfile",
+      "description": "Private student profiles and skill tracking."
+    },
+    "/student_public_profiles/{uid}": {
+      "schema": "StudentPublicProfile",
+      "description": "Public student profiles for talent matching."
+    },
+    "/anonymous_student_responses/{responseId}": {
+      "schema": "AnonymousStudentResponse",
+      "description": "Skill data provided by unauthenticated students."
+    },
+    "/student_profiles/{uid}/skill_logs/{logId}": {
+      "schema": "SkillLog",
+      "description": "Historical skill progression logs for a student."
+    },
+    "/aggregates/{aggregateId}": {
+      "schema": "SkillGapAggregates",
+      "description": "Pre-calculated or live-aggregated skill gap data."
+    }
+  }
+}
