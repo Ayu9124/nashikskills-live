@@ -1,19 +1,59 @@
 import React from 'react';
 import { Home as HomeIcon, LayoutDashboard, GraduationCap, Send, Info, LogIn, LogOut, User as UserIcon, BookOpen, Moon, Sun } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { User } from '../firebase';
+import { User, UserRole } from '../firebase';
 
 interface NavbarProps {
   currentView: string;
   setView: (v: string) => void;
   user: User | null;
+  userRole: UserRole | null;
   onLogin: () => void;
   onLogout: () => void;
   isDarkMode: boolean;
   onToggleTheme: () => void;
 }
 
-export const Navbar = ({ currentView, setView, user, onLogin, onLogout, isDarkMode, onToggleTheme }: NavbarProps) => (
+export const Navbar = ({ currentView, setView, user, userRole, onLogin, onLogout, isDarkMode, onToggleTheme }: NavbarProps) => {
+  const roleMenu = (() => {
+    if (userRole === 'student') {
+      return [
+        { id: 'home', label: 'Home', icon: HomeIcon },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'learning', label: 'Learning', icon: GraduationCap },
+        { id: 'resources', label: 'Resources', icon: BookOpen },
+        { id: 'profile', label: 'My Profile', icon: Send },
+      ];
+    }
+    if (userRole === 'industry') {
+      return [
+        { id: 'home', label: 'Home', icon: HomeIcon },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'post', label: 'Post Requirement', icon: Send },
+        { id: 'candidates', label: 'Candidates', icon: GraduationCap },
+        { id: 'insights', label: 'Insights', icon: Info },
+      ];
+    }
+    if (userRole === 'academic') {
+      return [
+        { id: 'home', label: 'Home', icon: HomeIcon },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'students', label: 'Students', icon: GraduationCap },
+        { id: 'reports', label: 'Reports', icon: BookOpen },
+        { id: 'insights', label: 'Insights', icon: Info },
+      ];
+    }
+    return [
+      { id: 'home', label: 'Home', icon: HomeIcon },
+      { id: 'dashboard', label: 'City Dashboard', icon: LayoutDashboard },
+      { id: 'student', label: 'For Students', icon: GraduationCap },
+      { id: 'resources', label: 'Skill Resources', icon: BookOpen },
+      { id: 'submit', label: 'Submit Data', icon: Send },
+      { id: 'about', label: 'About', icon: Info },
+    ];
+  })();
+
+  return (
   <nav className="fixed top-0 left-0 right-0 z-[200] h-[52px] flex items-center justify-between px-8 bg-bg/95 backdrop-blur-xl border-b border-b1">
     <div className="logo-serif text-[17px] cursor-pointer" onClick={() => setView('home')}>
       Nashik<span className="text-lime">Skills</span>
@@ -27,14 +67,7 @@ export const Navbar = ({ currentView, setView, user, onLogin, onLogout, isDarkMo
 
     <div className="flex items-center gap-4">
       <div className="flex gap-1">
-        {[
-          { id: 'home', label: 'Home', icon: HomeIcon },
-          { id: 'dashboard', label: 'City Dashboard', icon: LayoutDashboard },
-          { id: 'student', label: 'For Students', icon: GraduationCap },
-          { id: 'resources', label: 'Skill Resources', icon: BookOpen },
-          { id: 'submit', label: 'Submit Data', icon: Send },
-          { id: 'about', label: 'About', icon: Info },
-        ].map((item) => (
+        {roleMenu.map((item) => (
           <button
             key={item.id}
             onClick={() => setView(item.id)}
@@ -87,4 +120,5 @@ export const Navbar = ({ currentView, setView, user, onLogin, onLogout, isDarkMo
       )}
     </div>
   </nav>
-);
+  );
+};

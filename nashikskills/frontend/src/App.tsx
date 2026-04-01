@@ -27,17 +27,19 @@ import {
 import { Navbar } from './components/Navbar';
 import { Ticker } from './components/Ticker';
 import { HomeView } from './components/HomeView';
-import { DashboardView } from './components/DashboardView';
-import { StudentView } from './components/StudentView';
-import { SubmitView } from './components/SubmitView';
-import { ResourcesView } from './components/ResourcesView';
-import { AboutView } from './components/AboutView';
 import { AuthView } from './components/auth/AuthView';
 import { RoleGuard } from './components/auth/RoleGuard';
 import { getDashboardPathForRole } from './components/auth/roleUtils';
-import { StudentDashboard } from './components/dashboards/StudentDashboard';
-import { IndustryDashboard } from './components/dashboards/IndustryDashboard';
-import { AcademicDashboard } from './components/dashboards/AcademicDashboard';
+import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
+import { StudentLearningPage } from './pages/student/StudentLearningPage';
+import { StudentResourcesPage } from './pages/student/StudentResourcesPage';
+import { StudentProfilePage } from './pages/student/StudentProfilePage';
+import { IndustryDashboardPage } from './pages/industry/IndustryDashboardPage';
+import { IndustryPostPage } from './pages/industry/IndustryPostPage';
+import { IndustryCandidatesPage } from './pages/industry/IndustryCandidatesPage';
+import { AcademicDashboardPage } from './pages/academic/AcademicDashboardPage';
+import { AcademicStudentsPage } from './pages/academic/AcademicStudentsPage';
+import { AcademicReportsPage } from './pages/academic/AcademicReportsPage';
 import { Response as IndustryResponse } from './types';
 import { INITIAL_RESPONSES } from './data';
 
@@ -242,28 +244,50 @@ export default function App() {
   };
 
   const currentView = (() => {
-    if (location.pathname === '/') return 'home';
-    if (location.pathname === '/student') return 'student';
-    if (location.pathname === '/resources') return 'resources';
-    if (location.pathname === '/submit') return 'submit';
-    if (location.pathname === '/about') return 'about';
-    if (location.pathname.includes('dashboard')) return 'dashboard';
+    if (location.pathname === '/home' || location.pathname === '/') return 'home';
+    if (location.pathname.endsWith('/dashboard')) return 'dashboard';
+    if (location.pathname === '/student/learning') return 'learning';
+    if (location.pathname === '/student/resources') return 'resources';
+    if (location.pathname === '/student/profile') return 'profile';
+    if (location.pathname === '/industry/post') return 'post';
+    if (location.pathname === '/industry/candidates') return 'candidates';
+    if (location.pathname === '/industry/reports') return 'insights';
+    if (location.pathname === '/academic/students') return 'students';
+    if (location.pathname === '/academic/reports') return 'reports';
+    if (location.pathname === '/academic/insights') return 'insights';
     return 'home';
   })();
 
   const setViewFromNavbar = (nextView: string) => {
     setView(nextView);
-    if (nextView === 'home') navigate('/');
-    if (nextView === 'student') navigate('/student');
-    if (nextView === 'resources') navigate('/resources');
-    if (nextView === 'submit') navigate('/submit');
-    if (nextView === 'about') navigate('/about');
+    if (nextView === 'home') navigate('/home');
     if (nextView === 'dashboard') {
       if (userRole) {
         navigate(getDashboardPathForRole(userRole));
       } else {
         navigate('/auth');
       }
+    }
+    if (userRole === 'student') {
+      if (nextView === 'learning') navigate('/student/learning');
+      if (nextView === 'resources') navigate('/student/resources');
+      if (nextView === 'profile') navigate('/student/profile');
+    }
+    if (userRole === 'industry') {
+      if (nextView === 'post') navigate('/industry/post');
+      if (nextView === 'candidates') navigate('/industry/candidates');
+      if (nextView === 'insights') navigate('/industry/dashboard');
+    }
+    if (userRole === 'academic') {
+      if (nextView === 'students') navigate('/academic/students');
+      if (nextView === 'reports') navigate('/academic/reports');
+      if (nextView === 'insights') navigate('/academic/dashboard');
+    }
+    if (!userRole) {
+      if (nextView === 'student') navigate('/auth');
+      if (nextView === 'resources') navigate('/auth');
+      if (nextView === 'submit') navigate('/auth');
+      if (nextView === 'about') navigate('/home');
     }
   };
 
@@ -274,6 +298,7 @@ export default function App() {
           currentView={currentView} 
           setView={setViewFromNavbar} 
           user={user} 
+          userRole={userRole}
           onLogin={handleLogin} 
           onLogout={handleLogout} 
           isDarkMode={isDarkMode}
@@ -284,7 +309,8 @@ export default function App() {
         <main className="pt-0">
           <AnimatePresence mode="wait">
             <Routes>
-              <Route path="/" element={<HomeView key="home" setView={setViewFromNavbar} />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={<HomeView key="home" setView={setViewFromNavbar} />} />
               <Route
                 path="/auth"
                 element={<AuthView onGoogleLogin={handleLogin} onEmailLogin={handleEmailLogin} onRegister={handleRegister} />}
@@ -293,35 +319,91 @@ export default function App() {
                 path="/dashboard"
                 element={userRole ? <Navigate to={getDashboardPathForRole(userRole)} replace /> : <Navigate to="/auth" replace />}
               />
+
               <Route
-                path="/student-dashboard"
+                path="/student/dashboard"
                 element={
                   <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
-                    <StudentDashboard responses={responses} counts={counts} />
+                    <StudentDashboardPage user={user} profile={profile} onLogin={handleLogin} />
                   </RoleGuard>
                 }
               />
               <Route
-                path="/industry-dashboard"
+                path="/student/learning"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
+                    <StudentLearningPage user={user} profile={profile} onLogin={handleLogin} />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/student/resources"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
+                    <StudentResourcesPage />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/student/profile"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
+                    <StudentProfilePage user={user} profile={profile} onProfileUpdate={setProfile} />
+                  </RoleGuard>
+                }
+              />
+
+              <Route
+                path="/industry/dashboard"
                 element={
                   <RoleGuard user={user} role={userRole} allowedRoles={['industry']}>
-                    <IndustryDashboard responses={responses} counts={counts} />
+                    <IndustryDashboardPage responses={responses} counts={counts} />
                   </RoleGuard>
                 }
               />
               <Route
-                path="/academic-dashboard"
+                path="/industry/post"
                 element={
-                  <RoleGuard user={user} role={userRole} allowedRoles={['academic']}>
-                    <AcademicDashboard responses={responses} counts={counts} />
+                  <RoleGuard user={user} role={userRole} allowedRoles={['industry']}>
+                    <IndustryPostPage user={user} profile={profile} onProfileUpdate={setProfile} />
                   </RoleGuard>
                 }
               />
-              <Route path="/student" element={<StudentView key="student" user={user} profile={profile} onLogin={handleLogin} />} />
-              <Route path="/resources" element={<ResourcesView key="resources" />} />
-              <Route path="/submit" element={<SubmitView key="submit" user={user} profile={profile} onProfileUpdate={setProfile} />} />
-              <Route path="/about" element={<AboutView key="about" />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route
+                path="/industry/candidates"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['industry']}>
+                    <IndustryCandidatesPage />
+                  </RoleGuard>
+                }
+              />
+
+              <Route
+                path="/academic/dashboard"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['academic']}>
+                    <AcademicDashboardPage responses={responses} counts={counts} />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/academic/students"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['academic']}>
+                    <AcademicStudentsPage user={user} profile={profile} onProfileUpdate={setProfile} />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/academic/reports"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['academic']}>
+                    <AcademicReportsPage />
+                  </RoleGuard>
+                }
+              />
+
+              <Route path="*" element={<Navigate to="/home" replace />} />
             </Routes>
           </AnimatePresence>
 
