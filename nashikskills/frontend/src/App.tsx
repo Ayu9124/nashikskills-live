@@ -1,10 +1,13 @@
 import React, { useState, useEffect, Component, ErrorInfo, ReactNode } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { 
   auth, 
   db, 
   onAuthStateChanged, 
   signInWithPopup, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   googleProvider, 
   signOut, 
   onSnapshot, 
@@ -15,6 +18,9 @@ import {
   doc, 
   getDoc,
   User,
+  UserRole,
+  getUserRole,
+  setUserRole,
   handleFirestoreError,
   OperationType
 } from './firebase';
@@ -26,6 +32,12 @@ import { StudentView } from './components/StudentView';
 import { SubmitView } from './components/SubmitView';
 import { ResourcesView } from './components/ResourcesView';
 import { AboutView } from './components/AboutView';
+import { AuthView } from './components/auth/AuthView';
+import { RoleGuard } from './components/auth/RoleGuard';
+import { getDashboardPathForRole } from './components/auth/roleUtils';
+import { StudentDashboard } from './components/dashboards/StudentDashboard';
+import { IndustryDashboard } from './components/dashboards/IndustryDashboard';
+import { AcademicDashboard } from './components/dashboards/AcademicDashboard';
 import { Response as IndustryResponse } from './types';
 import { INITIAL_RESPONSES } from './data';
 
@@ -82,18 +94,46 @@ class ErrorBoundary extends Component<Props, State> {
 // --- Main App ---
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [view, setView] = useState('home');
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRoleState] = useState<UserRole | null>(null);
+  const [needsRoleSelection, setNeedsRoleSelection] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [responses, setResponses] = useState<IndustryResponse[]>(INITIAL_RESPONSES);
   const [counts, setCounts] = useState({ ind: 12, stu: 87 });
   const [isAuthReady, setIsAuthReady] = useState(false);
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme-mode');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const nextIsDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    setIsDarkMode(nextIsDark);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('theme-mode', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
   // Auth Listener
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      setNeedsRoleSelection(false);
       if (u) {
+        try {
+          const role = await getUserRole(u.uid);
+          setUserRoleState(role);
+          if (!role) {
+            setNeedsRoleSelection(true);
+          }
+        } catch (error) {
+          handleFirestoreError(error, OperationType.GET, `user_profiles/${u.uid}`);
+        }
+
         // Fetch profile
         const path = `student_profiles/${u.uid}`;
         try {
@@ -106,6 +146,7 @@ export default function App() {
           handleFirestoreError(error, OperationType.GET, path);
         }
       } else {
+        setUserRoleState(null);
         setProfile(null);
       }
       setIsAuthReady(true);
@@ -162,27 +203,142 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [view]);
 
+  useEffect(() => {
+    if (!isAuthReady) return;
+    if (!user) {
+      if (location.pathname.includes('dashboard')) {
+        navigate('/auth', { replace: true });
+      }
+      return;
+    }
+    if (userRole && location.pathname === '/auth') {
+      navigate(getDashboardPathForRole(userRole), { replace: true });
+    }
+  }, [isAuthReady, user, userRole, location.pathname, navigate]);
+
+  const handleEmailLogin = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const handleRegister = async (email: string, password: string, role: UserRole) => {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    await setUserRole(cred.user.uid, role, {
+      email: cred.user.email,
+      displayName: cred.user.displayName,
+    });
+    setUserRoleState(role);
+    navigate(getDashboardPathForRole(role), { replace: true });
+  };
+
+  const handleRoleSelection = async (role: UserRole) => {
+    if (!user) return;
+    await setUserRole(user.uid, role, {
+      email: user.email,
+      displayName: user.displayName,
+    });
+    setUserRoleState(role);
+    setNeedsRoleSelection(false);
+    navigate(getDashboardPathForRole(role), { replace: true });
+  };
+
+  const currentView = (() => {
+    if (location.pathname === '/') return 'home';
+    if (location.pathname === '/student') return 'student';
+    if (location.pathname === '/resources') return 'resources';
+    if (location.pathname === '/submit') return 'submit';
+    if (location.pathname === '/about') return 'about';
+    if (location.pathname.includes('dashboard')) return 'dashboard';
+    return 'home';
+  })();
+
+  const setViewFromNavbar = (nextView: string) => {
+    setView(nextView);
+    if (nextView === 'home') navigate('/');
+    if (nextView === 'student') navigate('/student');
+    if (nextView === 'resources') navigate('/resources');
+    if (nextView === 'submit') navigate('/submit');
+    if (nextView === 'about') navigate('/about');
+    if (nextView === 'dashboard') {
+      if (userRole) {
+        navigate(getDashboardPathForRole(userRole));
+      } else {
+        navigate('/auth');
+      }
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-bg text-text selection:bg-lime/30">
         <Navbar 
-          currentView={view} 
-          setView={setView} 
+          currentView={currentView} 
+          setView={setViewFromNavbar} 
           user={user} 
           onLogin={handleLogin} 
           onLogout={handleLogout} 
+          isDarkMode={isDarkMode}
+          onToggleTheme={() => setIsDarkMode(prev => !prev)}
         />
         <Ticker />
         
         <main className="pt-0">
           <AnimatePresence mode="wait">
-            {view === 'home' && <HomeView key="home" setView={setView} /> as any}
-            {view === 'dashboard' && <DashboardView key="dashboard" responses={responses} counts={counts} /> as any}
-            {view === 'student' && <StudentView key="student" user={user} profile={profile} onLogin={handleLogin} /> as any}
-            {view === 'resources' && <ResourcesView key="resources" /> as any}
-            {view === 'submit' && <SubmitView key="submit" user={user} profile={profile} onProfileUpdate={setProfile} /> as any}
-            {view === 'about' && <AboutView key="about" /> as any}
+            <Routes>
+              <Route path="/" element={<HomeView key="home" setView={setViewFromNavbar} />} />
+              <Route
+                path="/auth"
+                element={<AuthView onGoogleLogin={handleLogin} onEmailLogin={handleEmailLogin} onRegister={handleRegister} />}
+              />
+              <Route
+                path="/dashboard"
+                element={userRole ? <Navigate to={getDashboardPathForRole(userRole)} replace /> : <Navigate to="/auth" replace />}
+              />
+              <Route
+                path="/student-dashboard"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
+                    <StudentDashboard responses={responses} counts={counts} />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/industry-dashboard"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['industry']}>
+                    <IndustryDashboard responses={responses} counts={counts} />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/academic-dashboard"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['academic']}>
+                    <AcademicDashboard responses={responses} counts={counts} />
+                  </RoleGuard>
+                }
+              />
+              <Route path="/student" element={<StudentView key="student" user={user} profile={profile} onLogin={handleLogin} />} />
+              <Route path="/resources" element={<ResourcesView key="resources" />} />
+              <Route path="/submit" element={<SubmitView key="submit" user={user} profile={profile} onProfileUpdate={setProfile} />} />
+              <Route path="/about" element={<AboutView key="about" />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
           </AnimatePresence>
+
+          {user && needsRoleSelection ? (
+            <div className="fixed inset-0 z-[300] bg-bg/85 backdrop-blur-sm flex items-center justify-center p-6">
+              <div className="w-full max-w-md bg-s1 border border-b1 rounded-2xl p-6">
+                <div className="mono-label text-lime mb-2">Select role</div>
+                <h3 className="text-xl font-serif mb-2">Complete your account setup</h3>
+                <p className="text-muted text-sm mb-5">Choose the role that best matches your use-case.</p>
+                <div className="grid grid-cols-1 gap-2">
+                  <button onClick={() => handleRoleSelection('student')} className="px-4 py-2.5 rounded-lg bg-s2 border border-b2 text-left hover:border-lime">Student</button>
+                  <button onClick={() => handleRoleSelection('industry')} className="px-4 py-2.5 rounded-lg bg-s2 border border-b2 text-left hover:border-lime">Industry</button>
+                  <button onClick={() => handleRoleSelection('academic')} className="px-4 py-2.5 rounded-lg bg-s2 border border-b2 text-left hover:border-lime">Academic Institute</button>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </main>
 
         <footer className="py-12 px-8 border-t border-b1 bg-s1">

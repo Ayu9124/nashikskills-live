@@ -5,6 +5,25 @@
   --font-mono: "DM Mono", ui-monospace, SFMono-Regular, monospace;
   --font-serif: "Fraunces", serif;
 
+  --color-bg: #f6f7f9;
+  --color-s1: #ffffff;
+  --color-s2: #eef1f4;
+  --color-s3: #e5eaf0;
+  --color-b1: #d8e0e8;
+  --color-b2: #c4d0dc;
+  --color-b3: #93a2b1;
+  --color-text: #1b2430;
+  --color-muted: #5b6a79;
+  --color-muted2: #8392a0;
+  --color-lime: #3f7f3f;
+  --color-amber: #b07a00;
+  --color-coral: #c94e36;
+  --color-teal: #0f8a7a;
+  --color-purple: #6a73d9;
+  --color-blue: #3b82f6;
+}
+
+:root.dark {
   --color-bg: #080808;
   --color-s1: #0f0f0f;
   --color-s2: #161616;
@@ -13,8 +32,8 @@
   --color-b2: #2a2a2a;
   --color-b3: #383838;
   --color-text: #eeebe5;
-  --color-muted: #5a5a5a;
-  --color-muted2: #3a3a3a;
+  --color-muted: #8f8f8f;
+  --color-muted2: #5f5f5f;
   --color-lime: #c8f064;
   --color-amber: #f0a500;
   --color-coral: #ff6b4a;
@@ -26,6 +45,30 @@
 @layer base {
   body {
     @apply bg-bg text-text font-sans font-light overflow-x-hidden;
+  }
+
+  body,
+  nav,
+  main,
+  footer,
+  div,
+  section,
+  article,
+  button,
+  a,
+  input,
+  textarea,
+  select,
+  span,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  pre {
+    transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
   }
 }
 

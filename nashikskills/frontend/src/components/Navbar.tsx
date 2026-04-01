@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home as HomeIcon, LayoutDashboard, GraduationCap, Send, Info, LogIn, LogOut, User as UserIcon, BookOpen } from 'lucide-react';
+import { Home as HomeIcon, LayoutDashboard, GraduationCap, Send, Info, LogIn, LogOut, User as UserIcon, BookOpen, Moon, Sun } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { User } from '../firebase';
 
@@ -9,9 +9,11 @@ interface NavbarProps {
   user: User | null;
   onLogin: () => void;
   onLogout: () => void;
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
 }
 
-export const Navbar = ({ currentView, setView, user, onLogin, onLogout }: NavbarProps) => (
+export const Navbar = ({ currentView, setView, user, onLogin, onLogout, isDarkMode, onToggleTheme }: NavbarProps) => (
   <nav className="fixed top-0 left-0 right-0 z-[200] h-[52px] flex items-center justify-between px-8 bg-bg/95 backdrop-blur-xl border-b border-b1">
     <div className="logo-serif text-[17px] cursor-pointer" onClick={() => setView('home')}>
       Nashik<span className="text-lime">Skills</span>
@@ -48,6 +50,15 @@ export const Navbar = ({ currentView, setView, user, onLogin, onLogout }: Navbar
           </button>
         ))}
       </div>
+
+      <button
+        onClick={onToggleTheme}
+        className="p-2 rounded-md border border-b2 bg-s2 text-muted hover:text-text hover:border-lime transition-all"
+        title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+      </button>
 
       <div className="h-6 w-px bg-b1 mx-2 hidden sm:block" />
 

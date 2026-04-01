@@ -1,5 +1,14 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  User,
+} from 'firebase/auth';
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, onSnapshot, query, where, orderBy, limit, Timestamp, addDoc, serverTimestamp, getDocFromServer } from 'firebase/firestore';
 
 // Import the Firebase configuration
@@ -31,6 +40,10 @@ export enum OperationType {
   GET = 'get',
   WRITE = 'write',
 }
+
+export type UserRole = 'student' | 'industry' | 'academic';
+
+const USER_PROFILES_COLLECTION = 'user_profiles';
 
 interface FirestoreErrorInfo {
   error: string;
@@ -74,8 +87,35 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
+export async function getUserRole(uid: string): Promise<UserRole | null> {
+  const userDocRef = doc(db, USER_PROFILES_COLLECTION, uid);
+  const userDoc = await getDoc(userDocRef);
+  if (!userDoc.exists()) {
+    return null;
+  }
+  const data = userDoc.data();
+  return (data?.role as UserRole) || null;
+}
+
+export async function setUserRole(uid: string, role: UserRole, profile?: { email?: string | null; displayName?: string | null }) {
+  const userDocRef = doc(db, USER_PROFILES_COLLECTION, uid);
+  await setDoc(
+    userDocRef,
+    {
+      uid,
+      role,
+      email: profile?.email || null,
+      displayName: profile?.displayName || null,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
+}
+
 export { 
   signInWithPopup, 
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut, 
   onAuthStateChanged, 
   collection, 

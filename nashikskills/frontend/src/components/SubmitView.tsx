@@ -384,24 +384,6 @@ export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) 
                 >
                   {loading ? 'Submitting...' : 'Join the Nashik Talent Network →'}
                 </button>
-                <div className="mt-8 p-6 bg-s1 border border-b1 rounded-2xl">
-                  <div className="mono-label text-muted mb-4">Why join the Nashik Talent Network?</div>
-                  <div className="space-y-4">
-                    {[
-                      { t: 'Direct Pipeline', d: 'Connect with students already learning the specific tools you use.' },
-                      { t: 'Live Insights', d: 'See how your skill needs compare to the rest of Nashik\'s industry.' },
-                      { t: 'Yi Partnership', d: 'Gain visibility within the Young Indians & CII network.' },
-                    ].map(item => (
-                      <div key={item.t} className="flex gap-4">
-                        <div className="w-1.5 h-1.5 rounded-full bg-lime mt-1.5" />
-                        <div>
-                          <div className="text-[11px] font-bold">{item.t}</div>
-                          <div className="text-[10px] text-muted leading-relaxed">{item.d}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </form>
             ) : (
               <div className="space-y-6">
@@ -485,28 +467,6 @@ export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) 
             {!user && <p className="text-coral text-[11px] mb-4">Please login to save your profile.</p>}
             <p className="text-muted text-[13px] mb-4 leading-relaxed">Tell us where you are. We'll map your gap vs what Nashik's industry needs from you right now.</p>
             
-            <div className="flex flex-col gap-2 mb-8">
-              {[
-                'Get matched with top Nashik employers',
-                'Fast-track your career with free resources',
-                'See your live skill match score'
-              ].map((benefit, i) => (
-                <div key={i} className="flex items-center gap-2 text-[11px] text-teal font-medium">
-                  <CheckCircle2 size={12} />
-                  {benefit}
-                </div>
-              ))}
-            </div>
-            
-            {!user && (
-              <div className="p-4 bg-amber/5 border border-amber/20 rounded-xl mb-6">
-                <div className="text-[11px] font-bold text-amber mb-1">Quick Contribution Mode</div>
-                <div className="text-[10px] text-muted leading-relaxed">
-                  You are submitting anonymously. <button onClick={() => window.scrollTo(0,0)} className="text-amber underline">Login</button> later to build a persistent career profile and get matched with Nashik employers.
-                </div>
-              </div>
-            )}
-            
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="mono-label text-muted">College</label>
@@ -561,24 +521,6 @@ export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) 
             >
               {loading ? 'Saving...' : user ? 'Build My Nashik Career Profile →' : 'Submit My Skills to Nashik Data →'}
             </button>
-            <div className="mt-8 p-6 bg-s1 border border-b1 rounded-2xl">
-              <div className="mono-label text-muted mb-4">Why build your Nashik profile?</div>
-              <div className="space-y-4">
-                {[
-                  { t: 'Skill Matching', d: 'See exactly how your skills match what Nashik factories need today.' },
-                  { t: 'Free Resources', d: 'Get access to curated learning paths for the top 5 city-wide gaps.' },
-                  { t: 'Career Signal', d: 'Signal to local employers that you are ready for the modern workforce.' },
-                ].map(item => (
-                  <div key={item.t} className="flex gap-4">
-                    <div className="w-1.5 h-1.5 rounded-full bg-teal mt-1.5" />
-                    <div>
-                      <div className="text-[11px] font-bold">{item.t}</div>
-                      <div className="text-[10px] text-muted leading-relaxed">{item.d}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </form>
         )}
         
@@ -597,32 +539,6 @@ export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) 
         <div className="mono-label text-lime mb-2">What you get</div>
         <h2 className="section-h2 text-2xl mb-2">Join Nashik's largest talent network.</h2>
         <p className="text-muted text-[13px] mb-8 leading-relaxed">By sharing your skill gaps, you're not just providing data — you're building your future workforce.</p>
-        
-        <div className="space-y-3 mt-8">
-          {[
-            { icon: Building2, t: 'Get skilled candidates faster', d: 'Directly influence what students are learning in Nashik colleges.', c: 'text-lime' },
-            { icon: Briefcase, t: 'Reduce hiring cost', d: 'Find local talent that already has the digital skills you need.', c: 'text-teal' },
-            { icon: Users, t: 'Get visibility among students', d: 'Your company listed as an active Nashik hiring partner to 1000+ students.', c: 'text-amber' },
-          ].map(card => (
-            <div key={card.t} className="bg-s2 border border-b1 rounded-xl p-5 flex gap-4">
-              <div className={cn("p-3 rounded-lg bg-bg h-fit", card.c)}>
-                <card.icon size={20} />
-              </div>
-              <div>
-                <div className="text-[13px] font-semibold mb-1">{card.t}</div>
-                <div className="text-[11px] text-muted leading-relaxed">{card.d}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-12 pt-8 border-t border-b1">
-          <div className="mono-label text-muted mb-4">Trusted by Nashik's Industry</div>
-          <div className="grid grid-cols-2 gap-4 opacity-50 grayscale">
-            {['Mahindra', 'Bosch', 'Sula', 'Anand Traders'].map(co => (
-              <div key={co} className="text-[14px] font-serif italic font-bold">{co}</div>
-            ))}
-          </div>
-        </div>
       </div>
     </motion.div>
   );
