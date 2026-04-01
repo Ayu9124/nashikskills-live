@@ -4,7 +4,7 @@
  * In production, set VITE_API_URL to your deployed backend URL
  */
 
-const BASE_URL = import.meta.env.VITE_API_URL || '';
+const BASE_URL = "https://nashikskills-backend.onrender.com";
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
