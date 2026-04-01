@@ -15,6 +15,14 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ currentView, setView, user, userRole, onLogin, onLogout, isDarkMode, onToggleTheme }: NavbarProps) => {
+  const roleLabel = userRole === 'industry'
+    ? 'Industry'
+    : userRole === 'academic'
+      ? 'Academic Institute'
+      : userRole === 'student'
+        ? 'Student'
+        : 'Member';
+
   const roleMenu = (() => {
     if (userRole === 'student') {
       return [
@@ -99,7 +107,7 @@ export const Navbar = ({ currentView, setView, user, userRole, onLogin, onLogout
         <div className="flex items-center gap-3">
           <div className="hidden sm:block text-right">
             <div className="text-[11px] font-medium leading-none">{user.displayName}</div>
-            <div className="text-[9px] text-muted font-mono">Student</div>
+            <div className="text-[9px] text-muted font-mono">{roleLabel}</div>
           </div>
           <button 
             onClick={onLogout}

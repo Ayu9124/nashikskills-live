@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { 
+  AreaChart,
+  Area,
   LineChart, 
   Line, 
   XAxis, 
@@ -9,7 +11,9 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  Legend
+  Legend,
+  BarChart,
+  Bar
 } from 'recharts';
 import { cn } from '../lib/utils';
 import { SECTORS, TREND_DATA, ALL_SKILLS_LIST } from '../data';
@@ -31,6 +35,13 @@ export const DashboardView = ({ responses, counts }: DashboardViewProps) => {
   const autoGap = autoResponses.length > 0
     ? Math.round(autoResponses.reduce((acc, r) => acc + r.gap, 0) / autoResponses.length)
     : 87;
+
+  const sectorGapData = [
+    { sector: 'Auto', gap: responses.filter(r => r.sec === 'Auto & Mfg').reduce((sum, r, _, arr) => arr.length ? sum + r.gap / arr.length : sum, 0) || 87 },
+    { sector: 'Agri', gap: responses.filter(r => r.sec === 'Agri').reduce((sum, r, _, arr) => arr.length ? sum + r.gap / arr.length : sum, 0) || 74 },
+    { sector: 'SME', gap: responses.filter(r => r.sec === 'SME').reduce((sum, r, _, arr) => arr.length ? sum + r.gap / arr.length : sum, 0) || 71 },
+    { sector: 'Logistics', gap: responses.filter(r => r.sec === 'Logistics').reduce((sum, r, _, arr) => arr.length ? sum + r.gap / arr.length : sum, 0) || 68 },
+  ].map((item) => ({ ...item, gap: Math.round(item.gap) }));
 
   return (
     <motion.div 
@@ -92,8 +103,14 @@ export const DashboardView = ({ responses, counts }: DashboardViewProps) => {
           </div>
           <div className="bg-s1 border border-b1 rounded-xl p-6 mb-8 h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={TREND_DATA}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1c1c1c" vertical={false} />
+              <AreaChart data={TREND_DATA}>
+                <defs>
+                  <linearGradient id="erpGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ff6b4a" stopOpacity={0.28} />
+                    <stop offset="100%" stopColor="#ff6b4a" stopOpacity={0.03} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" stroke="#1f1f1f" vertical={false} />
                 <XAxis 
                   dataKey="name" 
                   stroke="#5a5a5a" 
@@ -112,15 +129,32 @@ export const DashboardView = ({ responses, counts }: DashboardViewProps) => {
                   domain={[50, 100]}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#161616', border: '1px solid #2a2a2a', borderRadius: '8px', fontSize: '11px' }}
+                  contentStyle={{ backgroundColor: '#141414', border: '1px solid #303030', borderRadius: '10px', fontSize: '11px' }}
                   itemStyle={{ padding: '2px 0' }}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', fontFamily: 'DM Mono', paddingTop: '20px' }} />
+                <Area type="monotone" dataKey="erp" stroke="none" fill="url(#erpGradient)" />
                 <Line type="monotone" dataKey="erp" name="ERP basics" stroke="#ff6b4a" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                 <Line type="monotone" dataKey="excel" name="Excel / Sheets" stroke="#f0a500" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                 <Line type="monotone" dataKey="tally" name="Tally / GST" stroke="#a78bfa" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
                 <Line type="monotone" dataKey="tracking" name="Digital tracking" stroke="#3dd9a4" strokeWidth={2} dot={{ r: 3 }} activeDot={{ r: 5 }} />
-              </LineChart>
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="mono-label text-muted mb-4 flex items-center gap-3">
+            Sector gap comparison
+            <div className="flex-1 h-px bg-b1" />
+          </div>
+          <div className="bg-s1 border border-b1 rounded-xl p-6 mb-8 h-[240px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={sectorGapData}>
+                <CartesianGrid strokeDasharray="4 4" stroke="#1f1f1f" vertical={false} />
+                <XAxis dataKey="sector" stroke="#5a5a5a" fontSize={10} axisLine={false} tickLine={false} fontFamily="DM Mono" />
+                <YAxis stroke="#5a5a5a" fontSize={10} axisLine={false} tickLine={false} fontFamily="DM Mono" domain={[40, 100]} tickFormatter={(v) => `${v}%`} />
+                <Tooltip contentStyle={{ backgroundColor: '#141414', border: '1px solid #303030', borderRadius: '10px', fontSize: '11px' }} />
+                <Bar dataKey="gap" fill="#3dd9a4" radius={[5, 5, 0, 0]} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
 

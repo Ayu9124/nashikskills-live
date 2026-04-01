@@ -37,6 +37,7 @@ import { StudentProfilePage } from './pages/student/StudentProfilePage';
 import { IndustryDashboardPage } from './pages/industry/IndustryDashboardPage';
 import { IndustryPostPage } from './pages/industry/IndustryPostPage';
 import { IndustryCandidatesPage } from './pages/industry/IndustryCandidatesPage';
+import { IndustryInsightsPage } from './pages/industry/IndustryInsightsPage';
 import { AcademicDashboardPage } from './pages/academic/AcademicDashboardPage';
 import { AcademicStudentsPage } from './pages/academic/AcademicStudentsPage';
 import { AcademicReportsPage } from './pages/academic/AcademicReportsPage';
@@ -251,7 +252,7 @@ export default function App() {
     if (location.pathname === '/student/profile') return 'profile';
     if (location.pathname === '/industry/post') return 'post';
     if (location.pathname === '/industry/candidates') return 'candidates';
-    if (location.pathname === '/industry/reports') return 'insights';
+    if (location.pathname === '/industry/insights') return 'insights';
     if (location.pathname === '/academic/students') return 'students';
     if (location.pathname === '/academic/reports') return 'reports';
     if (location.pathname === '/academic/insights') return 'insights';
@@ -276,7 +277,7 @@ export default function App() {
     if (userRole === 'industry') {
       if (nextView === 'post') navigate('/industry/post');
       if (nextView === 'candidates') navigate('/industry/candidates');
-      if (nextView === 'insights') navigate('/industry/dashboard');
+      if (nextView === 'insights') navigate('/industry/insights');
     }
     if (userRole === 'academic') {
       if (nextView === 'students') navigate('/academic/students');
@@ -374,6 +375,14 @@ export default function App() {
                 element={
                   <RoleGuard user={user} role={userRole} allowedRoles={['industry']}>
                     <IndustryCandidatesPage />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/industry/insights"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['industry']}>
+                    <IndustryInsightsPage responses={responses} counts={counts} />
                   </RoleGuard>
                 }
               />

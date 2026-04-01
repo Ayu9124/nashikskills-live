@@ -9,5 +9,5 @@ interface StudentProfilePageProps {
 }
 
 export const StudentProfilePage = ({ user, profile, onProfileUpdate }: StudentProfilePageProps) => (
-  <SubmitView user={user} profile={profile} onProfileUpdate={onProfileUpdate} />
+  <SubmitView user={user} profile={profile} onProfileUpdate={onProfileUpdate} forceStudent />
 );

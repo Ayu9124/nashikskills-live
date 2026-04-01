@@ -9,5 +9,5 @@ interface IndustryPostPageProps {
 }
 
 export const IndustryPostPage = ({ user, profile, onProfileUpdate }: IndustryPostPageProps) => (
-  <SubmitView user={user} profile={profile} onProfileUpdate={onProfileUpdate} />
+  <SubmitView user={user} profile={profile} onProfileUpdate={onProfileUpdate} forceIndustry />
 );

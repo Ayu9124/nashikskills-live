@@ -9,11 +9,13 @@ interface SubmitViewProps {
   user: User | null;
   profile: any;
   onProfileUpdate: (data: any) => void;
+  forceIndustry?: boolean;
+  forceStudent?: boolean;
   key?: string;
 }
 
-export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) => {
-  const [type, setType] = useState<'ind' | 'stu'>('stu');
+export const SubmitView = ({ user, profile, onProfileUpdate, forceIndustry = false, forceStudent = false }: SubmitViewProps) => {
+  const [type, setType] = useState<'ind' | 'stu'>(forceIndustry ? 'ind' : 'stu');
   const [subType, setSubType] = useState<'form' | 'search'>('form');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,6 +56,16 @@ export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) 
       });
     }
   }, [profile]);
+
+  React.useEffect(() => {
+    if (forceIndustry) {
+      setType('ind');
+      return;
+    }
+    if (forceStudent) {
+      setType('stu');
+    }
+  }, [forceIndustry, forceStudent]);
 
   const handleIndSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -237,18 +249,22 @@ export const SubmitView = ({ user, profile, onProfileUpdate }: SubmitViewProps) 
     >
       <div className="p-10 border-r border-b1">
         <div className="flex gap-1 p-1 bg-s2 rounded-lg w-fit mb-8">
-          <button 
-            onClick={() => setType('ind')}
-            className={cn("px-4 py-1.5 rounded-md text-[12px] transition-all", type === 'ind' ? "bg-bg text-text border border-b2 shadow-sm" : "text-muted")}
-          >
-            I'm an Employer
-          </button>
-          <button 
-            onClick={() => setType('stu')}
-            className={cn("px-4 py-1.5 rounded-md text-[12px] transition-all", type === 'stu' ? "bg-bg text-text border border-b2 shadow-sm" : "text-muted")}
-          >
-            I'm a Student
-          </button>
+          {!forceStudent ? (
+            <button 
+              onClick={() => setType('ind')}
+              className={cn("px-4 py-1.5 rounded-md text-[12px] transition-all", type === 'ind' ? "bg-bg text-text border border-b2 shadow-sm" : "text-muted")}
+            >
+              I'm an Employer
+            </button>
+          ) : null}
+          {!forceIndustry ? (
+            <button 
+              onClick={() => setType('stu')}
+              className={cn("px-4 py-1.5 rounded-md text-[12px] transition-all", type === 'stu' ? "bg-bg text-text border border-b2 shadow-sm" : "text-muted")}
+            >
+              I'm a Student
+            </button>
+          ) : null}
         </div>
 
         {type === 'ind' ? (
