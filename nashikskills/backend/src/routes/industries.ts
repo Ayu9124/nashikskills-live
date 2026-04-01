@@ -82,7 +82,9 @@ router.post('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const db = getFirestore();
-    const doc = await db.collection('industry_responses').doc(req.params.id).get();
+    const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+const doc = await db.collection('industry_responses').doc(id).get();
 
     if (!doc.exists) {
       res.status(404).json({ success: false, error: 'Not found' });
