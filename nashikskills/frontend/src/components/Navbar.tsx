@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home as HomeIcon, LayoutDashboard, GraduationCap, Send, Info, LogIn, LogOut, User as UserIcon, BookOpen, Moon, Sun } from 'lucide-react';
+import { Home as HomeIcon, LayoutDashboard, GraduationCap, Send, Info, LogIn, LogOut, User as UserIcon, BookOpen, Moon, Sun, Bot } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { User, UserRole } from '../firebase';
 
@@ -30,6 +30,7 @@ export const Navbar = ({ currentView, setView, user, userRole, onLogin, onLogout
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'learning', label: 'Learning', icon: GraduationCap },
         { id: 'resources', label: 'Resources', icon: BookOpen },
+        { id: 'interview', label: 'AI Interview', icon: Bot },
         { id: 'profile', label: 'My Profile', icon: Send },
       ];
     }

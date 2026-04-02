@@ -34,6 +34,7 @@ import { StudentDashboardPage } from './pages/student/StudentDashboardPage';
 import { StudentLearningPage } from './pages/student/StudentLearningPage';
 import { StudentResourcesPage } from './pages/student/StudentResourcesPage';
 import { StudentProfilePage } from './pages/student/StudentProfilePage';
+import { StudentInterviewPage } from './pages/student/StudentInterviewPage';
 import { IndustryDashboardPage } from './pages/industry/IndustryDashboardPage';
 import { IndustryPostPage } from './pages/industry/IndustryPostPage';
 import { IndustryCandidatesPage } from './pages/industry/IndustryCandidatesPage';
@@ -249,6 +250,7 @@ export default function App() {
     if (location.pathname.endsWith('/dashboard')) return 'dashboard';
     if (location.pathname === '/student/learning') return 'learning';
     if (location.pathname === '/student/resources') return 'resources';
+    if (location.pathname === '/student/interview') return 'interview';
     if (location.pathname === '/student/profile') return 'profile';
     if (location.pathname === '/industry/post') return 'post';
     if (location.pathname === '/industry/candidates') return 'candidates';
@@ -272,6 +274,7 @@ export default function App() {
     if (userRole === 'student') {
       if (nextView === 'learning') navigate('/student/learning');
       if (nextView === 'resources') navigate('/student/resources');
+      if (nextView === 'interview') navigate('/student/interview');
       if (nextView === 'profile') navigate('/student/profile');
     }
     if (userRole === 'industry') {
@@ -342,6 +345,14 @@ export default function App() {
                 element={
                   <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
                     <StudentResourcesPage />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/student/interview"
+                element={
+                  <RoleGuard user={user} role={userRole} allowedRoles={['student']}>
+                    <StudentInterviewPage />
                   </RoleGuard>
                 }
               />
