@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nashik Skills">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1b2430" />
+      <stop offset="100%" stop-color="#2f3f51" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg)" />
+  <path d="M22 45V19h5l15 18V19h5v26h-5L27 27v18h-5z" fill="#f6f7f9" />
+  <circle cx="47" cy="47" r="6" fill="#3f7f3f" />
+</svg>
